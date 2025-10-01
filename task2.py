@@ -1,22 +1,22 @@
 import pygame as pg
-
 FPS = 60
-WIN_WIDTH = 400
-WIN_HEIGHT = 100
-WHITE = (255, 255, 255)
-ORANGE = (255, 150, 100)
+WIDTH, HEIGHT = 1000, 600
+
+SKY_BLUE = (227, 231, 255)
+GREY = (189, 191, 199)
+GREY_2 = (189, 191, 199)
+
 
 pg.init()
-sc = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-sc.fill(WHITE)
+sc = pg.display.set_mode((WIDTH, HEIGHT))
+sc.fill(SKY_BLUE)
 pg.display.set_caption("Игра")
 clock = pg.time.Clock()
 
-r = 30
-x = 10
-y = WIN_HEIGHT // 2 - 25
-pg.draw.rect(sc, ORANGE, (x, y, 40, 40))
+pg.draw.rect(sc, GREY, (WIDTH / 2, HEIGHT / 2 - 60, 150, 290))
+pg.draw.polygon(sc, GREY_2, [[WIDTH / 2, HEIGHT / 2 - 60], [WIDTH / 2 + 75, HEIGHT / 2 - 60 - 60], [WIDTH / 2 + 150, HEIGHT / 2 - 60]])
 pg.display.update()
+
 
 flag_play = True
 while flag_play:
@@ -30,13 +30,8 @@ while flag_play:
     if not flag_play:
         break
 
-    
-    if x == WIN_WIDTH:
-        x -= 2  # перемещаем его за левую
-    else:  # если еще нет
-        x += 2  # то на следующей итерации цикла круг отобразится немного правее
+    # изменение объектов
+    # ...
 
-    sc.fill(WHITE)  # заливаем фон, стирая предыдущий круг
-    pg.draw.rect(sc, ORANGE, (x, y, 40, 40))  # рисуем новый, сдвинутый круг
-
-    pg.display.update() 
+    # обновление экрана
+    pg.display.update()
