@@ -1,3 +1,4 @@
+import random
 import pygame as pg
 
 FPS = 60
@@ -10,10 +11,9 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption("Игра")
 clock = pg.time.Clock()
 
-x, y = WIDTH / 2, HEIGHT / 2
+
 r = 30
-speed = 2
-pg.draw.circle(screen, ORANGE, (x, y), r)
+x, y = random.randint(r, WIDTH - r), random.randint(r, HEIGHT - r)
 pg.display.update()
 
 flag_play = True
@@ -28,15 +28,12 @@ while flag_play:
     if not flag_play:
         break
 
-    keys = pg.key.get_pressed()
-    if keys[pg.K_LEFT] and x - r > 0:
-        x -= 3
-    elif keys[pg.K_RIGHT] and x < WIDTH - r:
-        x += 3
-    elif keys[pg.K_UP] and y - r > 0:
-        y -= 3
-    elif keys[pg.K_DOWN] and y < HEIGHT - r:
-        y += 3
+    pressed = pg.mouse.get_pressed()
+    if pressed[1]:
+        pos = pg.mouse.get_pos()
+    dist = ((pos[0] - x) ** 2 + (pos[1] - y) ** 2) ** 0.5
+    if dist >= r:
+
 
 
 
