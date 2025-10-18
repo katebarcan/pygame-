@@ -14,7 +14,9 @@ clock = pg.time.Clock()
 
 r = 30
 x, y = random.randint(r, WIDTH - r), random.randint(r, HEIGHT - r)
+pg.draw.circle(screen, ORANGE, (x, y), r)
 pg.display.update()
+
 
 flag_play = True
 while flag_play:
@@ -23,22 +25,30 @@ while flag_play:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
-            flag_play = False
-            break
-    if not flag_play:
-        break
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 4:
+            pos = pg.mouse.get_pos()
+            dist = ((pos[0] - x) ** 2 + (pos[1] - y) ** 2) ** 0.5
+            if dist <= r and r <= 100:
+                r += 1
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 5:
+            dist = ((pos[0] - x) ** 2 + (pos[1] - y) ** 2) ** 0.5
+            if dist <= r and r >= 10:
+                r -= 1
 
     pressed = pg.mouse.get_pressed()
     if pressed[1]:
         pos = pg.mouse.get_pos()
-    dist = ((pos[0] - x) ** 2 + (pos[1] - y) ** 2) ** 0.5
-    if dist >= r:
+        dist = ((pos[0] - x) ** 2 + (pos[1] - y) ** 2) ** 0.5
+        if dist <= r:
+            x, y = random.randint(r, WIDTH - r), random.randint(r, HEIGHT - r)
+    if pressed[0]:
+        pos = pg.mouse.get_pos()
+        dist = ((pos[0] - x) ** 2 + (pos[1] - y) ** 2) ** 0.5
+        if dist <= r and r <= 100:
+            r += 1
 
-
-
-
-
-    screen.fill(MINT)
-    pg.draw.circle(screen, ORANGE, (x, y), r)
-
-    pg.display.update()
+    if pressed[2]:
+        pos = pg.mouse.get_pos()
+        dist = ((pos[0] - x) ** 2 + (pos[1] - y) ** 2) ** 0.5
+        if dist <= r and r >= 10:
+            r -= 1
