@@ -38,6 +38,10 @@ screen.blit(cannon1, (x1, y1))
 screen.blit(cannon2, (x2, y2))
 pg.display.update()
 
+
+rect1 = cannon1.get_rect(topleft=(x1, y1))
+rect2 = cannon2.get_rect(topleft=(x2, y2))
+
 speed1 = 5
 speed2 = 7
 
@@ -55,31 +59,31 @@ while flag_play:
     if not flag_play:
             break
 
-    keys = pg.key.get_pressed()
-    if x1 >= WIDTH:
+    if rect1.right >= WIDTH:
         flag1 = 'влево'
-    if x1 <= -220:
+    if rect1.left <= -220:
         flag1 = 'вправо'
 
     if flag1 == 'вправо':
-        x1 += speed1
-        y1 = 90
+        rect1.x += speed1
+        rect1.y = 90
     if flag1 == 'влево':
-        x1 -= speed1
-        y1 = 340
+        rect1.x -= speed1
+        rect1.y = 340
 
-    if x2 >= WIDTH:
+
+    if rect2.right >= WIDTH:
         flag2 = 'влево'
-    if x2 <= -220:
+    if rect2.left <= -220:
         flag2 = 'вправо'
     if flag2 == 'вправо':
-        x2 += speed2
-        y2 = 90
+        rect2.x += speed2
+        rect2.y = 90
     if flag2 == 'влево':
-        x2 -= speed2
-        y2 = 340
+        rect2.x -= speed2
+        rect2.y = 340
 
     screen.blit(background, (0, 0))
-    screen.blit(cannon1, (x1, y1))
-    screen.blit(cannon2, (x2, y2))
+    screen.blit(cannon1, rect1)
+    screen.blit(cannon2, rect2)
     pg.display.update()
