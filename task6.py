@@ -59,8 +59,9 @@ while flag_play:
     if not flag_play:
             break
 
-    if rect1.right >= WIDTH:
+    if rect1.left >= WIDTH:
         flag1 = 'влево'
+
     if rect1.left <= -220:
         flag1 = 'вправо'
 
@@ -71,8 +72,7 @@ while flag_play:
         rect1.x -= speed1
         rect1.y = 340
 
-
-    if rect2.right >= WIDTH:
+    if rect2.left >= WIDTH:
         flag2 = 'влево'
     if rect2.left <= -220:
         flag2 = 'вправо'
