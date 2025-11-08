@@ -12,22 +12,38 @@ GRAY = (186, 184, 182)
 RED = (245, 17, 17)
 BLUE = (101, 17, 245)
 
-class Cannon:
+class Ball:
     SIZE = HEIGHT * 1 / 4
 
-    def __int__(self):
-        self.surf = pg.Surface((Cannon.SIZE, Cannon.SIZE), pg.SRCALPHA)
-        self.rect = self.surf.get_rect(centerx=WIDTH / 2)
-        self.rect.top = HEIGHT * 3 / 4
-        self.surf.fill()
-        
-        self.speed = random.randint(1, 15)
+    def __init__(self):
+        self.speed = random.randint(5, 20)
         number1, number2, number3 = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
-        self.random_color = number1, number2, number3
-        self.SIZE = random.randint(1, 20)
-        time.sleep(0.2)
+        self.random_color = (number1, number2, number3)
+        self.radius = random.randint(5, 30)
 
-        
+        self.surf = pg.Surface((Ball.SIZE, Ball.SIZE), pg.SRCALPHA)
+        self.rect = self.surf.get_rect(centerx=WIDTH * 1 / 8)
+        self.rect.top = HEIGHT / 7
+        self.surf.fill((0, 0, 0, 0))
+        pg.draw.circle(self.surf, (*self.random_color, 100), (self.rect.width / 2, self.rect.height / 2), self.radius)
+
+    def draw(self, screen):
+        screen.blit(self.surf, self.rect)
+
+    def move(self):
+        if self.rect.top == round(HEIGHT * 1 / 7):
+            if self.rect.left <= WIDTH:
+                self.rect.left += self.speed
+            else:
+                self.rect.top += 220
+        else:
+            if self.rect.top == round(HEIGHT * 1 / 7):
+                if self.rect.
+            
+            
+                
+
+
 
 
 
@@ -42,35 +58,14 @@ background.fill(BROWN)
 pg.draw.rect(background, GRAY, (0, 100, WIDTH, 120))
 pg.draw.rect(background, GRAY, (0, 350, WIDTH, 120))
 
-cannon1 = pg.Surface((HEIGHT * 1 / 4, HEIGHT * 1 / 4), pg.SRCALPHA)
-cannon_rect = cannon1.get_rect(centerx=WIDTH / 2)
-cannon_rect.top = HEIGHT * 3 / 4
-cannon1.fill((0, 0, 0, 0))
-pg.draw.circle(cannon1, (*RED, 100), (cannon_rect.width / 2, cannon_rect.height / 2), 40)
-x1, y1 = 0, 90
-
-cannon2 = pg.Surface((HEIGHT * 1 / 4, HEIGHT * 1 / 4), pg.SRCALPHA)
-cannon_rect = cannon2.get_rect(centerx=WIDTH / 2)
-cannon_rect.top = HEIGHT * 3 / 4
-cannon2.fill((0, 0, 0, 0))
-pg.draw.circle(cannon2, (*BLUE, 100), (cannon_rect.width / 2, cannon_rect.height / 2), 20)
-x2, y2 = 0, 340
+fireworks = [Ball(), Ball()]
 
 screen.blit(background, (0, 0))
-screen.blit(cannon1, (x1, y1))
-screen.blit(cannon2, (x2, y2))
+for elem in fireworks:
+    elem.draw(screen)
 pg.display.update()
 
-
-rect1 = cannon1.get_rect(topleft=(x1, y1))
-rect2 = cannon2.get_rect(topleft=(x2, y2))
-
-speed1 = 5
-speed2 = 7
-
 flag_play = True
-flag1 = 'вправо'
-flag2 = 'вправо'
 while flag_play:
     clock.tick(FPS)
 
@@ -82,31 +77,10 @@ while flag_play:
     if not flag_play:
             break
 
-    if rect1.left >= WIDTH:
-        flag1 = 'влево'
-
-    if rect1.left <= -220:
-        flag1 = 'вправо'
-
-    if flag1 == 'вправо':
-        rect1.x += speed1
-        rect1.y = 90
-    if flag1 == 'влево':
-        rect1.x -= speed1
-        rect1.y = 340
-
-    if rect2.left >= WIDTH:
-        flag2 = 'влево'
-    if rect2.left <= -220:
-        flag2 = 'вправо'
-    if flag2 == 'вправо':
-        rect2.x += speed2
-        rect2.y = 90
-    if flag2 == 'влево':
-        rect2.x -= speed2
-        rect2.y = 340
+    for elem in fireworks:
+        elem.move()
 
     screen.blit(background, (0, 0))
-    screen.blit(cannon1, rect1)
-    screen.blit(cannon2, rect2)
+    for elem in fireworks:
+        elem.draw(screen)
     pg.display.update()
