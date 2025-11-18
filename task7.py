@@ -1,4 +1,5 @@
 import time
+from math import radians
 
 import pygame as pg
 import random
@@ -12,6 +13,7 @@ GRAY = (186, 184, 182)
 RED = (245, 17, 17)
 BLUE = (101, 17, 245)
 
+
 class Ball:
     SIZE = HEIGHT * 1 / 4
 
@@ -23,7 +25,7 @@ class Ball:
 
         self.surf = pg.Surface((Ball.SIZE, Ball.SIZE), pg.SRCALPHA)
         self.rect = self.surf.get_rect(centerx=WIDTH * 1 / 8)
-        self.rect.top = HEIGHT / 7
+        self.rect.top = round(HEIGHT / 7)
         self.surf.fill((0, 0, 0, 0))
         pg.draw.circle(self.surf, (*self.random_color, 100), (self.rect.width / 2, self.rect.height / 2), self.radius)
 
@@ -31,21 +33,20 @@ class Ball:
         screen.blit(self.surf, self.rect)
 
     def move(self):
-        if self.rect.top == round(HEIGHT * 1 / 7):
+        top_y = round(HEIGHT * 1 / 7)
+        bottom_y = top_y + 250
+
+        if self.rect.top == top_y:
             if self.rect.left <= WIDTH:
                 self.rect.left += self.speed
             else:
-                self.rect.top += 220
+                self.rect.top = bottom_y
         else:
-            if self.rect.top == round(HEIGHT * 1 / 7):
-                if self.rect.
-            
-            
-                
-
-
-
-
+            if self.rect.top == bottom_y:
+                if self.rect.right >= 0:
+                    self.rect.right -= self.speed
+                else:
+                    self.rect.top = top_y
 
 
 pg.init()
@@ -74,8 +75,16 @@ while flag_play:
             pg.quit()
             flag_play = False
             break
-    if not flag_play:
-            break
+
+    if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+        new_ball = Ball()
+        new_ball.rect.left = 0
+        new_ball.rect.top = random.choice([int(round(HEIGHT * 1 / 7)), int(round(HEIGHT * 1 / 7))])
+        new_ball.surf.fill((0, 0, 0, 0))
+        pg.draw.circle(new_ball.surf, (*new_ball.random_color, 100), (int(new_ball.rect.width / 2), int(new_ball.rect.height / 2)), new_ball.radius)
+        fireworks.append(new_ball)
+
+
 
     for elem in fireworks:
         elem.move()
@@ -83,4 +92,5 @@ while flag_play:
     screen.blit(background, (0, 0))
     for elem in fireworks:
         elem.draw(screen)
+
     pg.display.update()
