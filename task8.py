@@ -47,23 +47,26 @@ class Player:
         if (self.rect.top + dy * self.speed) > 0 and (self.rect.bottom + dy * self.speed) < WIN_HEIGHT:
             self.rect.y += dy * self.speed
 
-    # def eat(self):
+    def eat(self, r_food):
+        if self.r <= 70:
+            self.r += r_food
+            self.surf.fill((0, 0, 0, 0))
+            pg.draw.circle(self.surf, (*Player.COLOR, 255), (self.rect.width / 2, self.rect.height / 2), self.r)
 
 
     def draw(self, screen):
         screen.blit(self.surf, self.rect)
 
 
-    def check_collusions(player, foods):
+    def check_collisions(player, foods):
         for food in foods:
             if food.active == True:
                 offset = (food.rect.x - player.rect.x, food.rect.y - player.rect.y)
                 if player.mask.overlap(food.mask, offset) is not None:
-                    if player
-
-
-
-
+                    food.active = False
+                    foods.append(Food())
+                    r_food = food.random_size
+                    player.eat(r_food)
 
 
 pg.init()
@@ -102,8 +105,11 @@ while flag_play:
     if keys[pg.K_DOWN]:
         player.move(dy=1)
 
+    player.check_collisions(foods)
+
     screen.fill((255, 255, 255))
     for elem in foods:
-        elem.draw(screen)
+        if elem.active == True:
+            elem.draw(screen)
     player.draw(screen)
     pg.display.update()
