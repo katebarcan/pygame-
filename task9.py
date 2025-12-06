@@ -3,9 +3,12 @@ import random
 
 FPS = 60
 WIN_WIDTH, WIN_HEIGHT = 1000, 600
-RED = (194, 0, 0)
+PINK = (245, 125, 255)
+PINK_1 = (243, 82, 255)
+WHITE = (255, 255, 255)
+GREY_BLUE, DARK_GREY_BLUE = (57, 64, 82), (28, 32, 43)
+GRAY = (41, 40, 40)
 BLACK = (0, 0, 0)
-YELLOW, DARK_YELLOW = (255, 255, 0), (224, 207, 18)
 
 
 class Food:
@@ -19,17 +22,20 @@ class Food:
         self.surf = pg.Surface((Food.SIZE * 2, Food.SIZE * 2), pg.SRCALPHA)
         self.rect = self.surf.get_rect(center=(random_x, random_y))
         self.surf.fill((0, 0, 0, 0))
-        pg.draw.circle(self.surf, (*RED, 255), (self.rect.width / 2, self.rect.height / 2), self.random_size)
+        pg.draw.circle(self.surf, (*PINK, 255), (self.rect.width / 2, self.rect.height / 2), self.random_size)
+        pg.draw.circle(self.surf, (*PINK_1, 255), (self.rect.width / 2, self.rect.height / 2), self.random_size, 3)
 
         self.active = True
         self.mask = pg.mask.from_surface(self.surf)
 
     def draw(self, screen):
-        screen.blit(self.surf, self.rect)
+        if self.active:
+            screen.blit(self.surf, self.rect)
 
 
 class Player:
-    COLOR = (27, 4, 143)
+    COLOR = (255, 0, 0)
+    COLOR_1 = (166, 7, 7)
     WIDTH, HEIGHT = 150, 150
     SPEED = 3
 
@@ -38,9 +44,15 @@ class Player:
         self.rect = self.surf.get_rect(center=(WIN_WIDTH / 2, WIN_HEIGHT / 2))
         self.surf.fill((0, 0, 0, 0))
         self.r = 30
-        pg.draw.circle(self.surf, (*Player.COLOR, 255), (self.rect.width / 2, self.rect.height / 2), self.r)
+        self.update_surface()
 
         self.speed = Player.SPEED
+        self.mask = pg.mask.from_surface(self.surf)
+
+    def update_surface(self):
+        self.surf.fill((0, 0, 0, 0))
+        pg.draw.circle(self.surf, (*Player.COLOR, 255), (self.rect.width / 2, self.rect.height / 2), self.r)
+        pg.draw.circle(self.surf, (*Player.COLOR_1, 255), (self.rect.width / 2, self.rect.height / 2), self.r, 3)
         self.mask = pg.mask.from_surface(self.surf)
 
     def move(self, dx=0, dy=0):
@@ -52,27 +64,26 @@ class Player:
     def eat(self, r_food):
         if self.r <= 70:
             self.r += r_food
-            self.surf.fill((0, 0, 0, 0))
-            pg.draw.circle(self.surf, (*Player.COLOR, 255), (self.rect.width / 2, self.rect.height / 2), self.r)
+            self.update_surface()
 
-    def start_r(self):
+    def reset_radius(self):
         self.r = 30
-        self.surf.fill((0, 0, 0, 0))
-        pg.draw.circle(self.surf, (*Player.COLOR, 255), (self.rect.width / 2, self.rect.height / 2), self.r)
+        self.update_surface()
 
     def draw(self, screen):
         screen.blit(self.surf, self.rect)
 
 
 def check_collisions(player, foods):
-    for food in foods:
-        if food.active == True:
+    for food in foods[:]:
+        if food.active:
             offset = (food.rect.x - player.rect.x, food.rect.y - player.rect.y)
             if player.mask.overlap(food.mask, offset) is not None:
                 food.active = False
                 foods.append(Food())
                 r_food = food.random_size
                 player.eat(r_food)
+
 
 
 class Text:
@@ -82,11 +93,12 @@ class Text:
         self.rect = self.suft.get_rect(center=text_pos)
 
     def change_text(self, new_text):
-        
-        self.rect = self.suft.get_rect(center=new_text)
+        self.suft = self.font.render(new_text, True, WHITE)
+        self.rect = self.suft.get_rect(center=(WIN_WIDTH / 2, WIN_HEIGHT / 7))
 
     def draw(self, screen):
         screen.blit(self.suft, self.rect)
+
 
 class Button:
     def __init__(self, text, text_size, text_color, button_color, button_cover_color, button_pos):
@@ -98,7 +110,7 @@ class Button:
         self.button_surf = pg.Surface((self.text_surf.get_width() + 50, self.text_surf.get_height() + 50))
         self.button_rect = self.button_surf.get_rect(center=button_pos)
         self.button_surf.fill(button_color)
-        pg.draw.rect(self.button_surf, BLACK, (0, 0, self.button_rect.width, self.button_rect.height), 3)
+        pg.draw.rect(self.button_surf, WHITE, (0, 0, self.button_rect.width, self.button_rect.height), 3)
 
     def redraw(self, state):
         if state:
@@ -112,9 +124,12 @@ class Button:
         screen.blit(self.button_surf, self.button_rect)
         screen.blit(self.text_surf, self.text_rect)
 
-def check_click_on_button(button):
+
+def check_click_on_button(button, player, radius_text):
     if button.button_rect.collidepoint(pg.mouse.get_pos()):
-        player.start_r()
+        player.reset_radius()
+        radius_text.change_text(f"Радиус: {player.r}")
+
 
 def check_mouse_on_button(button):
     if button.button_rect.collidepoint(pg.mouse.get_pos()):
@@ -122,29 +137,16 @@ def check_mouse_on_button(button):
     else:
         button.redraw(state=False)
 
+
 pg.init()
 screen = pg.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 pg.display.set_caption("Игра")
 clock = pg.time.Clock()
 
-foods = [Food(), Food(), Food(), Food()]
+foods = [Food() for _ in range(4)]
 player = Player()
-
-my_text = Text(str(player.r), 32, BLACK, (WIN_WIDTH / 2, WIN_HEIGHT / 7))
-my_button = Button('сбросить', 45, BLACK, YELLOW, DARK_YELLOW, (WIN_WIDTH / 2, WIN_HEIGHT * 2 / 2.5))
-
-screen.fill((255, 255, 255))
-my_text.draw(screen)
-my_button.draw(screen)
-for elem in foods:
-    elem.draw(screen)
-player.draw(screen)
-
-
-screen.fill((255, 255, 255))
-my_text.draw(screen)
-my_button.draw(screen)
-pg.display.update()
+my_text = Text(f"Радиус: {player.r}", 32, WHITE , (WIN_WIDTH / 2, WIN_HEIGHT / 7))
+my_button = Button('сбросить', 45, BLACK, GREY_BLUE, DARK_GREY_BLUE, (WIN_WIDTH / 2, WIN_HEIGHT * 2 / 2.5))
 
 flag_play = True
 while flag_play:
@@ -156,11 +158,12 @@ while flag_play:
             flag_play = False
             break
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            check_click_on_button(my_button)
+            check_click_on_button(my_button, player, my_text)
     if not flag_play:
         break
 
     check_mouse_on_button(my_button)
+
 
     keys = pg.key.get_pressed()
     if keys[pg.K_LEFT]:
@@ -174,11 +177,15 @@ while flag_play:
 
     check_collisions(player, foods)
 
-    screen.fill((255, 255, 255))
+    if hasattr(my_text, 'suft'):
+        my_text.change_text(f"Радиус: {player.r}")
+
+    screen.fill(GRAY)
     my_text.draw(screen)
     my_button.draw(screen)
     for elem in foods:
-        if elem.active == True:
-            elem.draw(screen)
+        elem.draw(screen)
     player.draw(screen)
     pg.display.update()
+
+pg.quit()
